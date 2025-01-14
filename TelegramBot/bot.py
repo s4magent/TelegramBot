@@ -6,7 +6,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 telegram_token = "7378387007:AAGRott_mvI9rdDiHnmrURllYNF-tkPL7EU"  # Замените на свой токен
 
 # Установите ключ OpenAI API
-openai.api_key = "OPENAI_API_KEY"  # Замените на ваш ключ OpenAI
+openai.api_key = "your_api_key_here"  # Замените на ваш ключ OpenAI
 
 # Функция, которая будет отвечать на команду /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
