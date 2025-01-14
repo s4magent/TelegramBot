@@ -1,3 +1,4 @@
+import os
 import openai
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
@@ -5,8 +6,8 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 # Ваш токен Telegram
 telegram_token = "7378387007:AAGRott_mvI9rdDiHnmrURllYNF-tkPL7EU"  # Замените на свой токен
 
-# Установите ключ OpenAI API
-openai.api_key = "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"  # Замените на ваш ключ OpenAI
+# Получаем ключ OpenAI API из переменной окружения
+openai.api_key = os.getenv("OPENAI_API_KEY")  # Используем переменную окружения
 
 # Функция, которая будет отвечать на команду /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
