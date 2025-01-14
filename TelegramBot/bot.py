@@ -3,10 +3,10 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
 # Ваш токен Telegram
-telegram_token = "7378387007:AAGRott_mvI9rdDiHnmrURllYNF-tkPL7EU"
+telegram_token = "TELEGRAM_TOKEN"
 
 # Установите ключ OpenAI API
-openai.api_key = "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"  # Замените на ваш ключ OpenAI
+openai.api_key = "OPENAI_API_KEY"  # Замените на ваш ключ OpenAI
 
 # Функция, которая будет отвечать на команду /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
