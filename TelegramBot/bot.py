@@ -2,7 +2,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 
 # Ваш токен
-telegram_token = "7378387007:AAEz8lMqQaNhnJk90U6HkxjcJXvcX-5bxO4
+telegram_token = "7378387007:AAEz8lMqQaNhnJk90U6HkxjcJXvcX-5bxO4"
 "
 
 # Функция, которая будет отвечать на команду /start
