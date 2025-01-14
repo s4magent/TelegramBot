@@ -7,7 +7,7 @@ telegram_token = "7378387007:AAGRott_mvI9rdDiHnmrURllYNF-tkPL7EU"
 # Функция, которая будет отвечать на команду /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if update.message:
-        await update.message.bot.send_message(chat_id=update.message.chat_id, text="Привет! Я твой бот.")
+        await context.bot.send_message(chat_id=update.message.chat_id, text="Привет! Я твой бот.")
     else:
         print("Нет сообщения!")
 
