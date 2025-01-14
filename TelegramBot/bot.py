@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
 
 # Ваш токен Telegram
-telegram_token = "TELEGRAM_TOKEN"
+telegram_token = "TELEGRAM_TOKEN"  # Замените на свой токен
 
 # Установите ключ OpenAI API
 openai.api_key = "OPENAI_API_KEY"  # Замените на ваш ключ OpenAI
