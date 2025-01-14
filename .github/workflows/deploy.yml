@@ -1,1 +1,29 @@
+name: Deploy Bot
 
+on:
+  push:
+    branches:
+      - main  # Запускать при пуше в основную ветку
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Выбираем машину для работы
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2  # Клонируем ваш репозиторий
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.x  # Настроить Python
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt  # Установить зависимости, если они есть
+
+    - name: Run bot
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}  # Передаем секретный ключ из GitHub Secrets
+      run: |
+        python bot.py  # Запускаем ваш скрипт
