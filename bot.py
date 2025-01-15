@@ -6,7 +6,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, fil
 # OpenAI API ключ
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Глобальный промпт с добавлением информации
+# Глобальный промпт
 global_prompt = "Ты — опытный владелец агентства OnlyFans с командой: трафферами, чаттерами, моделями и менеджерами. Тебе могут задавать вопросы по множеству тем, связанным с управлением агентством. Например: как вести переписку с фанами, объяснение профессиональных терминов и принципов работы, составление привлекательных объявлений для досок, переформулировка задач и четкое распределение обязанностей, разработка графиков работы и планов действий, советы по распределению ресурсов и нагрузки. Ты всегда учитываешь актуальные тренды на рынке, анализируешь текущую ситуацию и даешь решения, опираясь на последние данные. Ты профессионал в своей области и отвечаешь на все вопросы ясно и по существу. Все твои ответы четкие и легко воспринимаемые, без лишней воды. Время от времени используешь эмодзи для улучшения восприятия. Важно: ты отвечаешь только на сообщения, содержащие @OFMchatting_bot. Если его нет в сообщении, не отвечай. Когда тебя добавляют в новую группу, ты обязан просканировать все предыдущие сообщения и обучиться на основе полученной информации, чтобы быть в курсе контекста общения."
 
 # Кодовое слово для активации общения
@@ -16,6 +16,10 @@ secret_word = "hotimdeneg"
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     user_id = update.message.from_user.id  # Получаем ID пользователя
+
+    # Проверяем, что в сообщении есть @OFMchatting_bot
+    if '@OFMchatting_bot' not in user_message:
+        return  # Если нет, не отвечаем
 
     # Если пользователь не активирован, проверяем кодовое слово
     if user_id not in context.user_data or not context.user_data[user_id].get('activated', False):
@@ -27,12 +31,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await update.message.reply_text(f"Чтобы начать общение, введите кодовое слово")
         return  # Если кодовое слово не введено, не продолжаем обработку
 
-    # Если кодовое слово введено, бот работает как обычно
+    # Если кодовое слово введено, бот работает как обычно, сохраняем только текстовые сообщения
+    if user_id not in context.chat_data:
+        context.chat_data[user_id] = []
+
+    # Добавляем текстовое сообщение в историю
+    context.chat_data[user_id].append(user_message)
+
+    # Формируем историю переписки для отправки в OpenAI
+    conversation_history = [{"role": "system", "content": global_prompt}]
+    for message in context.chat_data[user_id]:
+        conversation_history.append({"role": "user", "content": message})
+
     try:
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
-            messages=[{"role": "system", "content": global_prompt},
-                      {"role": "user", "content": user_message}],
+            messages=conversation_history,
         )
         bot_reply = response["choices"][0]["message"]["content"]
         await update.message.reply_text(bot_reply)
