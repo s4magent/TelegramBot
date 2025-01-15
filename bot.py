@@ -23,7 +23,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Если кодовое слово не введено, бот не отвечает
     if not context.user_data.get('activated', False):
-        await update.message.reply_text(f"Чтобы начать общение, введите кодовое слово: {secret_word}")
+        await update.message.reply_text(f"Чтобы начать общение, введите кодовое слово:")
         return
 
     try:
