@@ -1,54 +1,30 @@
 import os
 import openai
 from telegram import Update
-from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 
-# Ваш токен Telegram
-telegram_token = "7378387007:AAHAxs3mrLCq4YdI1F__0OzU4PPNLhTmbfo"  # Замените на свой токен
+# OpenAI API ключ
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Получаем ключ OpenAI API из переменной окружения
-openai.api_key = os.getenv("OPENAI_API_KEY")  # Используем переменную окружения
-
-# Функция, которая будет отвечать на команду /start
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message:
-        await context.bot.send_message(chat_id=update.message.chat_id, text="Привет! Я твой бот. Напиши что-нибудь, и я передам это ChatGPT.")
-    else:
-        print("Нет сообщения!")
-
-# Функция, которая будет отправлять сообщения в ChatGPT и отвечать пользователю
-async def chat_with_gpt(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_message = update.message.text  # Получаем сообщение пользователя
-
+# Обработчик сообщений
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_message = update.message.text
     try:
-        # Отправляем запрос в OpenAI API
-        response = openai.Completion.create(
-            model="gpt-3.5-turbo",  # Используем модель GPT-3.5
-            prompt=user_message,
-            max_tokens=150  # Максимальное количество токенов для ответа
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": user_message}],
         )
-        bot_response = response.choices[0].text.strip()  # Ответ ChatGPT
-
-        # Отправляем ответ пользователю
-        await update.message.reply_text(bot_response)
-
+        bot_reply = response["choices"][0]["message"]["content"]
+        await update.message.reply_text(bot_reply)
     except Exception as e:
-        # Если возникла ошибка, отправляем сообщение о проблеме
-        await update.message.reply_text("Произошла ошибка при обработке вашего запроса. Попробуйте позже.")
-        print(f"Ошибка OpenAI: {e}")
+        await update.message.reply_text(f"Ошибка: {e}")
 
-# Основная функция
-def main() -> None:
-    application = Application.builder().token(telegram_token).build()
-
-    # Регистрируем обработчики команд
-    application.add_handler(CommandHandler("start", start))
-    
-    # Регистрируем обработчик текстовых сообщений
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, chat_with_gpt))
-
-    # Запускаем бота
-    application.run_polling()
+# Обработчик команды /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Привет! Я ChatGPT-бот. Задай мне любой вопрос.")
 
 if __name__ == "__main__":
-    main()
+    application = ApplicationBuilder().token(os.getenv("TELEGRAM_BOT_TOKEN")).build()
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    application.run_polling()
