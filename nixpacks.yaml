@@ -1,7 +1,0 @@
-name: telegram-bot
-build:
-  language: python
-  python_version: "3.9"
-  install_dependencies: true
-  install_commands:
-    - pip install -r requirements.txt
