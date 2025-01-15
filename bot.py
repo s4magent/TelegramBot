@@ -15,21 +15,20 @@ secret_word = "hotimdeneg"
 # Обработчик сообщений
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
+    user_id = update.message.from_user.id  # Получаем ID пользователя
 
-    # Проверка на кодовое слово
-    if user_message.lower() == secret_word:
-        await update.message.reply_text("Привет! Ты активировал меня. Теперь можешь задавать вопросы.")
-        return  # Бот отвечает на активацию, но дальше не идет
+    # Если пользователь не активирован, проверяем кодовое слово
+    if user_id not in context.user_data or not context.user_data[user_id].get('activated', False):
+        if user_message.lower() == secret_word:
+            # Активируем пользователя
+            context.user_data[user_id] = {'activated': True}
+            await update.message.reply_text("Привет! Ты активировал бота. Теперь можешь задавать вопросы.")
+        else:
+            await update.message.reply_text(f"Чтобы начать общение, введите кодовое слово.")
+        return  # Если кодовое слово не введено, не продолжаем обработку
 
-    # Если кодовое слово не введено, бот не отвечает
-    if not context.user_data.get('activated', False):
-        await update.message.reply_text(f"Чтобы начать общение, введите кодовое слово:")
-        return
-
+    # Если кодовое слово введено, бот работает как обычно
     try:
-        # Включаем глобальный промпт в запрос
-        prompt = f"{global_prompt}\nСообщение пользователя: {user_message}"
-
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "system", "content": global_prompt},
