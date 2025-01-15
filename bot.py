@@ -17,12 +17,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
     user_id = update.message.from_user.id  # Получаем ID пользователя
 
-    # Проверяем, что в сообщении есть @OFMchatting_bot
-    if '@OFMchatting_bot' not in user_message:
-        return  # Если нет, не отвечаем
-
     # Если пользователь не активирован, проверяем кодовое слово
     if user_id not in context.user_data or not context.user_data[user_id].get('activated', False):
+        # При запросе кодового слова упоминание @OFMchatting_bot не нужно
         if user_message.lower() == secret_word:
             # Активируем пользователя
             context.user_data[user_id] = {'activated': True}
@@ -30,6 +27,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await update.message.reply_text(f"Чтобы начать общение, введите кодовое слово")
         return  # Если кодовое слово не введено, не продолжаем обработку
+
+    # После активации, проверяем наличие @OFMchatting_bot в сообщении
+    if '@OFMchatting_bot' not in user_message:
+        return  # Если нет, не отвечаем
 
     # Если кодовое слово введено, бот работает как обычно, сохраняем только текстовые сообщения
     if user_id not in context.chat_data:
